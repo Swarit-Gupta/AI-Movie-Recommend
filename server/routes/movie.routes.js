@@ -8,12 +8,13 @@ const {
   searchMovies,
   getMovieDetails
 } = require('../controllers/movie.controller');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
-router.get('/popular', getPopularMovies);
-router.get('/top-rated', getTopRatedMovies);
-router.get('/now-playing', getNowPlayingMovies);
-router.get('/upcoming', getUpcomingMovies);
-router.get('/search', searchMovies);
-router.get('/:id', getMovieDetails);
+router.get('/popular', apiLimiter, getPopularMovies);
+router.get('/top-rated', apiLimiter, getTopRatedMovies);
+router.get('/now-playing', apiLimiter, getNowPlayingMovies);
+router.get('/upcoming', apiLimiter, getUpcomingMovies);
+router.get('/search', apiLimiter, searchMovies);
+router.get('/:id', apiLimiter, getMovieDetails);
 
 module.exports = router;
