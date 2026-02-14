@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
     }
 
     // Check if user already exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
@@ -39,10 +39,10 @@ exports.register = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user._id)
+        token: generateToken(user.id)
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -65,15 +65,18 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    // Check for user (include password for comparison)
-    const user = await User.findOne({ email }).select('+password');
+    // Check for user (Sequelize returns password by default, we need it for comparison)
+    const user = await User.findOne({ 
+      where: { email },
+      attributes: { include: ['password'] }
+    });
 
     if (user && (await user.comparePassword(password))) {
       res.json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user._id)
+        token: generateToken(user.id)
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -89,11 +92,11 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findByPk(req.user.id);
 
     if (user) {
       res.json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         createdAt: user.createdAt

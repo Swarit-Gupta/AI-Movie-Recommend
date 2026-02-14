@@ -5,7 +5,7 @@ const recommendationService = require('../services/recommendation.service');
 // @access  Private
 exports.getRecommendations = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const limit = parseInt(req.query.limit) || 20;
 
     const recommendations = await recommendationService.getRecommendations(userId, limit);

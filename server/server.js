@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/database');
+const { connectDB } = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const movieRoutes = require('./routes/movie.routes');
 const ratingRoutes = require('./routes/rating.routes');
 const recommendationRoutes = require('./routes/recommendation.routes');
+const moodRoutes = require('./routes/mood.routes');
 
 // Initialize express app
 const app = express();
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/mood', moodRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

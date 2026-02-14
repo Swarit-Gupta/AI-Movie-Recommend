@@ -1,5 +1,6 @@
 const Rating = require('../models/Rating');
 const tmdbService = require('../services/tmdb.service');
+const { Op } = require('sequelize');
 
 // @desc    Add or update a movie rating
 // @route   POST /api/ratings
@@ -7,7 +8,7 @@ const tmdbService = require('../services/tmdb.service');
 exports.addRating = async (req, res) => {
   try {
     const { movieId, rating, movieTitle, moviePoster, genres } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     // Validate input
     if (!movieId || !rating || !movieTitle) {
@@ -19,7 +20,7 @@ exports.addRating = async (req, res) => {
     }
 
     // Check if rating already exists
-    let existingRating = await Rating.findOne({ userId, movieId });
+    let existingRating = await Rating.findOne({ where: { userId, movieId } });
 
     if (existingRating) {
       // Update existing rating
@@ -60,17 +61,17 @@ exports.addRating = async (req, res) => {
 // @access  Private
 exports.getUserRatings = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    const ratings = await Rating.find({ userId })
-      .sort({ updatedAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const total = await Rating.countDocuments({ userId });
+    const { rows: ratings, count: total } = await Rating.findAndCountAll({
+      where: { userId },
+      order: [['updatedAt', 'DESC']],
+      offset,
+      limit
+    });
 
     res.json({
       ratings,
@@ -91,7 +92,10 @@ exports.getMovieRatings = async (req, res) => {
   try {
     const { movieId } = req.params;
 
-    const ratings = await Rating.find({ movieId }).select('rating createdAt');
+    const ratings = await Rating.findAll({ 
+      where: { movieId },
+      attributes: ['rating', 'createdAt']
+    });
 
     if (ratings.length === 0) {
       return res.json({
@@ -101,7 +105,7 @@ exports.getMovieRatings = async (req, res) => {
       });
     }
 
-    const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0);
+    const totalRating = ratings.reduce((sum, r) => sum + parseFloat(r.rating), 0);
     const averageRating = totalRating / ratings.length;
 
     res.json({
@@ -121,9 +125,9 @@ exports.getMovieRatings = async (req, res) => {
 exports.getUserMovieRating = async (req, res) => {
   try {
     const { movieId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
-    const rating = await Rating.findOne({ userId, movieId: parseInt(movieId) });
+    const rating = await Rating.findOne({ where: { userId, movieId: parseInt(movieId) } });
 
     if (!rating) {
       return res.json({ rating: null });
@@ -142,11 +146,11 @@ exports.getUserMovieRating = async (req, res) => {
 exports.deleteRating = async (req, res) => {
   try {
     const { movieId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
-    const rating = await Rating.findOneAndDelete({ userId, movieId: parseInt(movieId) });
+    const deleted = await Rating.destroy({ where: { userId, movieId: parseInt(movieId) } });
 
-    if (!rating) {
+    if (!deleted) {
       return res.status(404).json({ message: 'Rating not found' });
     }
 

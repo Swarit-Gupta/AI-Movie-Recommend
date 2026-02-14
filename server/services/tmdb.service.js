@@ -88,7 +88,33 @@ class TMDBService {
         params: {
           api_key: this.apiKey,
           language: 'en-US',
-          append_to_response: 'credits,videos'
+          append_to_response: 'credits,videos,watch/providers,external_ids'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(`TMDB API Error: ${error.message}`);
+    }
+  }
+
+  async getWatchProviders(movieId) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/movie/${movieId}/watch/providers`, {
+        params: {
+          api_key: this.apiKey
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(`TMDB API Error: ${error.message}`);
+    }
+  }
+
+  async getExternalIds(movieId) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/movie/${movieId}/external_ids`, {
+        params: {
+          api_key: this.apiKey
         }
       });
       return response.data;

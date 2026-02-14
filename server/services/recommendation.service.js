@@ -1,5 +1,6 @@
 const Rating = require('../models/Rating');
 const tmdbService = require('./tmdb.service');
+const { Op } = require('sequelize');
 
 class RecommendationService {
   /**
@@ -9,7 +10,10 @@ class RecommendationService {
   async getRecommendations(userId, limit = 20) {
     try {
       // Get user's ratings
-      const userRatings = await Rating.find({ userId }).sort({ rating: -1, createdAt: -1 });
+      const userRatings = await Rating.findAll({ 
+        where: { userId },
+        order: [['rating', 'DESC'], ['createdAt', 'DESC']]
+      });
 
       if (userRatings.length === 0) {
         // New user - return popular movies
@@ -41,7 +45,7 @@ class RecommendationService {
       const movieIds = new Set();
 
       // Focus on movies rated 4 or 5 stars
-      const highlyRatedMovies = userRatings.filter(r => r.rating >= 4).slice(0, 5);
+      const highlyRatedMovies = userRatings.filter(r => parseFloat(r.rating) >= 4).slice(0, 5);
 
       for (const rating of highlyRatedMovies) {
         try {
@@ -121,10 +125,13 @@ class RecommendationService {
 
       // Get movies rated highly by similar users that current user hasn't seen
       for (const similarUserId of similarUsers.slice(0, 10)) {
-        const similarUserRatings = await Rating.find({
-          userId: similarUserId,
-          rating: { $gte: 4 }
-        }).limit(20);
+        const similarUserRatings = await Rating.findAll({
+          where: {
+            userId: similarUserId,
+            rating: { [Op.gte]: 4 }
+          },
+          limit: 20
+        });
 
         for (const rating of similarUserRatings) {
           if (!userMovieIds.has(rating.movieId)) {
@@ -132,7 +139,7 @@ class RecommendationService {
               id: rating.movieId,
               title: rating.movieTitle,
               poster_path: rating.moviePoster,
-              recommendationScore: rating.rating * 20,
+              recommendationScore: parseFloat(rating.rating) * 20,
               recommendationType: 'collaborative'
             });
           }
@@ -170,9 +177,11 @@ class RecommendationService {
       const userMovieIds = userRatings.map(r => r.movieId);
       
       // Find users who rated at least 2 of the same movies
-      const similarUserRatings = await Rating.find({
-        movieId: { $in: userMovieIds },
-        userId: { $ne: userId }
+      const similarUserRatings = await Rating.findAll({
+        where: {
+          movieId: { [Op.in]: userMovieIds },
+          userId: { [Op.ne]: userId }
+        }
       });
 
       // Calculate similarity scores
@@ -180,7 +189,7 @@ class RecommendationService {
       similarUserRatings.forEach(rating => {
         const userRating = userRatings.find(r => r.movieId === rating.movieId);
         if (userRating) {
-          const similarityScore = 5 - Math.abs(userRating.rating - rating.rating);
+          const similarityScore = 5 - Math.abs(parseFloat(userRating.rating) - parseFloat(rating.rating));
           userScores[rating.userId] = (userScores[rating.userId] || 0) + similarityScore;
         }
       });
@@ -188,7 +197,7 @@ class RecommendationService {
       // Return user IDs sorted by similarity
       return Object.entries(userScores)
         .sort((a, b) => b[1] - a[1])
-        .map(([userId]) => userId);
+        .map(([userId]) => parseInt(userId));
     } catch (error) {
       console.error('Find similar users error:', error);
       return [];

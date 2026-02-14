@@ -1,48 +1,90 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
+const User = require('./User');
 
-const ratingSchema = new mongoose.Schema({
+const Rating = sequelize.define('Rating', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   },
   movieId: {
-    type: Number,
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Movie ID is required'
+      }
+    }
   },
   rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
+    type: DataTypes.DECIMAL(2, 1),
+    allowNull: false,
+    validate: {
+      min: {
+        args: [1],
+        msg: 'Rating must be at least 1'
+      },
+      max: {
+        args: [5],
+        msg: 'Rating must be at most 5'
+      },
+      notNull: {
+        msg: 'Rating is required'
+      }
+    }
   },
   movieTitle: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: 'Movie title is required'
+      }
+    }
   },
   moviePoster: {
-    type: String
+    type: DataTypes.STRING,
+    allowNull: true
   },
-  genres: [{
-    type: Number
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+  genres: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    get() {
+      const rawValue = this.getDataValue('genres');
+      return rawValue ? JSON.parse(rawValue) : [];
+    },
+    set(value) {
+      this.setDataValue('genres', JSON.stringify(value || []));
+    }
   }
+}, {
+  tableName: 'ratings',
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['userId', 'movieId']
+    },
+    {
+      fields: ['userId']
+    },
+    {
+      fields: ['movieId']
+    }
+  ]
 });
 
-// Create compound index for userId and movieId
-ratingSchema.index({ userId: 1, movieId: 1 }, { unique: true });
+// Define association
+Rating.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Rating, { foreignKey: 'userId', as: 'ratings' });
 
-// Update the updatedAt timestamp before saving
-ratingSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-module.exports = mongoose.model('Rating', ratingSchema);
+module.exports = Rating;
