@@ -1,0 +1,32 @@
+.rating {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.star:not(.readonly):hover {
+  transform: scale(1.2);
+}
+
+.star.active {
+  color: #ffd700;
+}
+
+.star.readonly {
+  cursor: default;
+}
+
+.star:focus {
+  outline: none;
+}
