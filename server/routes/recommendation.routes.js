@@ -4,6 +4,6 @@ const { getRecommendations } = require('../controllers/recommendation.controller
 const { protect } = require('../middleware/auth');
 const { userActionLimiter } = require('../middleware/rateLimiter');
 
-router.get('/', protect, userActionLimiter, getRecommendations);
+router.get('/', userActionLimiter, protect, getRecommendations);
 
 module.exports = router;

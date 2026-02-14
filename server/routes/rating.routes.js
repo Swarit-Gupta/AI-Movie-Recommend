@@ -8,12 +8,12 @@ const {
   deleteRating
 } = require('../controllers/rating.controller');
 const { protect } = require('../middleware/auth');
-const { userActionLimiter } = require('../middleware/rateLimiter');
+const { userActionLimiter, apiLimiter } = require('../middleware/rateLimiter');
 
-router.post('/', protect, userActionLimiter, addRating);
-router.get('/user', protect, userActionLimiter, getUserRatings);
-router.get('/movie/:movieId', getMovieRatings);
-router.get('/user/:movieId', protect, userActionLimiter, getUserMovieRating);
-router.delete('/:movieId', protect, userActionLimiter, deleteRating);
+router.post('/', userActionLimiter, protect, addRating);
+router.get('/user', userActionLimiter, protect, getUserRatings);
+router.get('/movie/:movieId', apiLimiter, getMovieRatings);
+router.get('/user/:movieId', userActionLimiter, protect, getUserMovieRating);
+router.delete('/:movieId', userActionLimiter, protect, deleteRating);
 
 module.exports = router;
