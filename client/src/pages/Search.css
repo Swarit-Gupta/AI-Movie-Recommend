@@ -1,24 +1,28 @@
 .search-page {
   min-height: calc(100vh - 200px);
-  padding: 2rem;
+  padding: 3rem 2rem;
+  background: var(--primary-black);
 }
 
 .search-header {
-  max-width: 800px;
-  margin: 0 auto 3rem;
+  max-width: 900px;
+  margin: 0 auto 4rem;
   text-align: center;
 }
 
 .search-header h1 {
-  font-size: 2.5rem;
-  color: #fff;
-  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .search-header p {
-  font-size: 1.1rem;
-  color: #888;
-  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  font-weight: 400;
 }
 
 .search-bar-container {
@@ -26,26 +30,43 @@
 }
 
 .search-results {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
 .results-title {
-  font-size: 1.5rem;
-  color: #fff;
-  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.results-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-red) 0%, transparent 100%);
+  border-radius: 2px;
 }
 
 .movies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
 }
 
 .search-placeholder {
   text-align: center;
-  padding: 4rem 2rem;
-  color: #888;
+  padding: 5rem 2rem;
+  color: var(--text-tertiary);
+  font-size: 1.1rem;
+  font-weight: 400;
 }
 
 .search-placeholder h2 {

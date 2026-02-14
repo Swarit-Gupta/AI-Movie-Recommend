@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { getImageUrl } from '../utils/helpers';
 import './MovieCard.css';
 
-const MovieCard = ({ movie, showRating = false, userRating = null }) => {
-  const { id, title, poster_path, vote_average, release_date } = movie;
+const MovieCard = ({ movie, showRating = false, userRating = null, showMoodScore = false }) => {
+  const { id, title, poster_path, vote_average, release_date, moodScore, moodMatch } = movie;
 
   return (
     <Link to={`/movie/${id}`} className="movie-card">
@@ -21,6 +21,11 @@ const MovieCard = ({ movie, showRating = false, userRating = null }) => {
         {userRating && (
           <div className="movie-card-user-rating">
             ❤️ {userRating}
+          </div>
+        )}
+        {showMoodScore && moodScore && (
+          <div className="movie-card-mood-score">
+            🎭 {Math.round(moodScore)}
           </div>
         )}
       </div>

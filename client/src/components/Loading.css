@@ -4,16 +4,17 @@
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .spinner {
-  border: 4px solid #333;
-  border-top: 4px solid #e50914;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid var(--accent-red);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
 }
 
 @keyframes spin {
@@ -22,7 +23,9 @@
 }
 
 .loading p {
-  margin-top: 1rem;
-  font-size: 1rem;
-  color: #888;
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }

@@ -112,7 +112,17 @@ const MovieDetail = () => {
           )}
 
           <div className="movie-meta">
-            <span className="meta-item">⭐ {movie.vote_average?.toFixed(1)}/10</span>
+            <span className="meta-item">⭐ TMDB: {movie.vote_average?.toFixed(1)}/10</span>
+            {movie.external_ids?.imdb_id && (
+              <a 
+                href={`https://www.imdb.com/title/${movie.external_ids.imdb_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="meta-item imdb-link"
+              >
+                🎬 View on IMDb
+              </a>
+            )}
             <span className="meta-item">📅 {formatDate(movie.release_date)}</span>
             <span className="meta-item">⏱️ {formatRuntime(movie.runtime)}</span>
           </div>
@@ -124,6 +134,96 @@ const MovieDetail = () => {
                   {genre.name}
                 </span>
               ))}
+            </div>
+          )}
+
+          {movie['watch/providers']?.results?.US && (
+            <div className="streaming-providers">
+              <h2>🎬 Where to Watch (US)</h2>
+              
+              {movie['watch/providers'].results.US.flatrate && (
+                <div className="provider-section">
+                  <h3>Streaming (Free with Subscription)</h3>
+                  <div className="provider-list">
+                    {movie['watch/providers'].results.US.flatrate.map((provider) => (
+                      <div key={provider.provider_id} className="provider-item" title={provider.provider_name}>
+                        <div 
+                          className="provider-logo"
+                          style={{
+                            backgroundImage: `url(https://image.tmdb.org/t/p/original${provider.logo_path})`
+                          }}
+                          role="img"
+                          aria-label={provider.provider_name}
+                        />
+                        <span className="provider-name">{provider.provider_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {movie['watch/providers'].results.US.free && (
+                <div className="provider-section">
+                  <h3>Free with Ads</h3>
+                  <div className="provider-list">
+                    {movie['watch/providers'].results.US.free.map((provider) => (
+                      <div key={provider.provider_id} className="provider-item" title={provider.provider_name}>
+                        <div 
+                          className="provider-logo"
+                          style={{
+                            backgroundImage: `url(https://image.tmdb.org/t/p/original${provider.logo_path})`
+                          }}
+                          role="img"
+                          aria-label={provider.provider_name}
+                        />
+                        <span className="provider-name">{provider.provider_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {movie['watch/providers'].results.US.rent && (
+                <div className="provider-section">
+                  <h3>Rent ($)</h3>
+                  <div className="provider-list">
+                    {movie['watch/providers'].results.US.rent.map((provider) => (
+                      <div key={provider.provider_id} className="provider-item" title={provider.provider_name}>
+                        <div 
+                          className="provider-logo"
+                          style={{
+                            backgroundImage: `url(https://image.tmdb.org/t/p/original${provider.logo_path})`
+                          }}
+                          role="img"
+                          aria-label={provider.provider_name}
+                        />
+                        <span className="provider-name">{provider.provider_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {movie['watch/providers'].results.US.buy && (
+                <div className="provider-section">
+                  <h3>Buy ($$)</h3>
+                  <div className="provider-list">
+                    {movie['watch/providers'].results.US.buy.map((provider) => (
+                      <div key={provider.provider_id} className="provider-item" title={provider.provider_name}>
+                        <div 
+                          className="provider-logo"
+                          style={{
+                            backgroundImage: `url(https://image.tmdb.org/t/p/original${provider.logo_path})`
+                          }}
+                          role="img"
+                          aria-label={provider.provider_name}
+                        />
+                        <span className="provider-name">{provider.provider_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
