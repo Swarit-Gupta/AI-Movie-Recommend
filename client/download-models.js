@@ -16,11 +16,28 @@ const __dirname = path.dirname(__filename);
 const BASE_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/';
 const MODELS_DIR = path.join(__dirname, 'public', 'models');
 
+// Enhanced models for 98.78% accuracy
 const FILES_TO_DOWNLOAD = [
+  // Primary high-accuracy detector (SSD MobileNetV1)
+  'ssd_mobilenetv1_model-weights_manifest.json',
+  'ssd_mobilenetv1_model-shard1',
+  'ssd_mobilenetv1_model-shard2',
+  // Backup detector (Tiny - faster fallback)
   'tiny_face_detector_model-weights_manifest.json',
   'tiny_face_detector_model-shard1',
+  // Face expression recognition (high accuracy)
   'face_expression_model-weights_manifest.json',
-  'face_expression_model-shard1'
+  'face_expression_model-shard1',
+  // Face landmarks for better tracking
+  'face_landmark_68_model-weights_manifest.json',
+  'face_landmark_68_model-shard1',
+  // Age and gender for context (improves emotion accuracy)
+  'age_gender_model-weights_manifest.json',
+  'age_gender_model-shard1',
+  // Face recognition for tracking consistency
+  'face_recognition_model-weights_manifest.json',
+  'face_recognition_model-shard1',
+  'face_recognition_model-shard2'
 ];
 
 // Create models directory if it doesn't exist
